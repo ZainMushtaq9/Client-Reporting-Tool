@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Dashboard Overview
+            </h2>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+            {% if current_user.is_admin() %}
+            <a href="{{ url_for('clients.add') }}"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                Add New Client
+            </a>
+            <form action="{{ url_for('reports.generate_all') }}" method="POST"
+                onsubmit="return confirm('Generate reports for all active clients?');">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">
+                    Generate All Reports
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <!-- Active Clients -->
+        <div
+            class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 border border-gray-100 flex items-center justify-between">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Active Clients</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ active_clients }}</dd>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-full text-primary">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <!-- Reports Month -->
+        <div
+            class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 border border-gray-100 flex items-center justify-between">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 truncate">Reports This Month</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reports_month }}</dd>
+            </div>
+            <div class="p-3 bg-indigo-50 rounded-full text-indigo-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <!-- Emails Sent -->
+        <div
+            class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 border border-gray-100 flex items-center justify-between">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 truncate">Emails Sent (MTD)</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ emails_sent }}</dd>
+            </div>
+            <div class="p-3 bg-green-50 rounded-full text-green-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <!-- Scheduled Clients -->
+        <div
+            class="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 border border-gray-100 flex items-center justify-between">
+            <div>
+                <dt class="text-sm font-medium text-gray-500 truncate">Scheduled Clients</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ scheduled_clients }}</dd>
+            </div>
+            <div class="p-3 bg-purple-50 rounded-full text-purple-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports Table -->
+    <div class="bg-white shadow rounded-lg border border-gray-100">
+        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Reports</h3>
+        </div>
+        {% if recent_reports %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Client</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Period</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Generated At</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for r in recent_reports %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ r.client.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ r.period_start.strftime("%b
+                            %Y") }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
+                            r.generated_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if r.status == 'generated' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Generated</span>
+                            {% elif r.status == 'sent' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sent</span>
+                            {% elif r.status == 'error' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Error</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <a href="{{ url_for('clients.view', id=r.client_id) }}" class="text-primary hover:underline"
+                                title="View Web Dashboard">View HTML</a>
+                            {% if r.pdf_path %}
+                            <a href="{{ url_for('reports.download', id=r.id) }}" class="text-accent hover:underline"
+                                title="Download PDF">PDF</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="px-4 py-12 text-center text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+            </svg>
+            No reports generated yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

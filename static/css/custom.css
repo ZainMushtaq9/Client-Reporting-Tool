@@ -1,0 +1,20 @@
+:root {
+  --primary: #1D4ED8;
+  --accent: #065F46;
+}
+
+.bg-primary { background-color: var(--primary) !important; }
+.text-primary { color: var(--primary) !important; }
+.btn-primary { background-color: var(--primary); color: #fff; border: none; }
+.btn-primary:hover { filter: brightness(0.88); }
+.border-primary { border-color: var(--primary); }
+
+.bg-accent { background-color: var(--accent) !important; }
+.text-accent { color: var(--accent) !important; }
+
+.sidebar-active { background-color: var(--primary) !important; border-radius: 6px; color: white !important; }
+
+body {
+  background-color: #F1F5F9;
+  font-family: 'Inter', sans-serif;
+}

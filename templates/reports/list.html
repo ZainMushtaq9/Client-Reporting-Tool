@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="md:flex md:items-center md:justify-between mb-6">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">All Reports</h2>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4">
+            {% if current_user.is_admin() %}
+            <form action="{{ url_for('reports.generate_all') }}" method="POST"
+                onsubmit="return confirm('Generate reports for all active clients?');">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">
+                    Generate All Now
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg border border-gray-100">
+        {% if reports %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Period</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Generated</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for r in reports %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ r.client.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ r.period_start.strftime('%B
+                            %Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
+                            r.generated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap block">
+                            {% if r.status == 'generated' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Generated</span>
+                            {% elif r.status == 'sent' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sent</span><br>
+                            <span class="text-xs text-gray-400 mt-1 inline-block">{{ r.emailed_at.strftime('%m/%d') if
+                                r.emailed_at else '' }}</span>
+                            {% elif r.status == 'error' %}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Error</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                            <a href="{{ url_for('clients.view', id=r.client_id) }}"
+                                class="text-primary hover:underline">HTML</a>
+                            {% if r.pdf_path %}
+                            <a href="{{ url_for('reports.download', id=r.id) }}"
+                                class="text-accent hover:underline">PDF</a>
+                            {% endif %}
+
+                            {% if current_user.is_admin() %}
+                            {% if r.pdf_path %}
+                            <form action="{{ url_for('reports.send_email', id=r.id) }}" method="POST" class="inline"
+                                onsubmit="return confirm('Email this report to the client?');">
+                                <button type="submit"
+                                    class="text-indigo-600 hover:text-indigo-900 hover:underline">Email</button>
+                            </form>
+                            {% endif %}
+                            <form action="{{ url_for('reports.delete', id=r.id) }}" method="POST" class="inline"
+                                onsubmit="return confirm('Delete this report completely?');">
+                                <button type="submit"
+                                    class="text-red-600 hover:text-red-900 hover:underline">Delete</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="py-12 text-center text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+            </svg>
+            No reports have been generated yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

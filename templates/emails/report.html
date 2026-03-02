@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+
+            background-color: {
+                    {
+                    settings.primary_color
+                }
+            }
+
+            ;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>{{ client.name }} - Monthly Performance Report</h2>
+        <p>Attached is your performance report for {{ report.period_start.strftime('%B %Y') }}.</p>
+        <p>Please review the PDF attachment to see metrics on traffic, conversions, and campaign performance.</p>
+        <p><br>Thank you,<br>{{ settings.company_name }} team</p>
+    </div>
+</body>
+
+</html>

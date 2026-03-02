@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ get_company_settings().company_name }} - Client Reporter</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  {% set s = get_company_settings() %}
+  <style>
+    :root {
+      --primary: {{ s.primary_color | default("#1D4ED8") }};
+      --accent:  {{ s.accent_color  | default("#065F46") }};
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden text-gray-800">
+
+  {% if current_user.is_authenticated %}
+  <!-- Sidebar -->
+  <aside class="w-64 flex-shrink-0 flex flex-col pt-6 pb-4" style="background-color: #0F2544;">
+    <div class="px-6 mb-8 text-white">
+      {% if s.logo_filename %}
+      <img src="{{ url_for('static', filename='uploads/logo/' + s.logo_filename) }}" alt="Logo" class="h-10 mb-2">
+      {% endif %}
+      <h1 class="text-xl font-bold truncate">{{ s.company_name }}</h1>
+    </div>
+    
+    <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+      <a href="{{ url_for('dashboard.index') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-white {% if request.endpoint == 'dashboard.index' %}sidebar-active{% endif %}">
+        Dashboard
+      </a>
+      <a href="{{ url_for('clients.list_clients') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-white {% if request.endpoint and request.endpoint.startswith('clients.') %}sidebar-active{% endif %}">
+        Clients
+      </a>
+      <a href="{{ url_for('reports.list_reports') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-white {% if request.endpoint and request.endpoint.startswith('reports.') %}sidebar-active{% endif %}">
+        Reports
+      </a>
+      
+      {% if current_user.is_admin() %}
+      <div class="my-4 border-t border-gray-700"></div>
+      
+      <a href="{{ url_for('settings.index') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-white {% if request.endpoint and request.endpoint.startswith('settings.') %}sidebar-active{% endif %}">
+        Settings
+      </a>
+      <a href="{{ url_for('users.index') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-white {% if request.endpoint and request.endpoint.startswith('users.') %}sidebar-active{% endif %}">
+        Users
+      </a>
+      {% endif %}
+    </nav>
+    
+    <div class="px-4 mt-auto border-t border-gray-700 pt-4">
+      <div class="flex items-center justify-between px-4 py-2">
+        <span class="text-sm font-medium text-white max-w-[100px] truncate" title="{{ current_user.username }}">
+          {{ current_user.username }}
+        </span>
+        <a href="{{ url_for('auth.logout') }}" class="text-xs text-gray-400 hover:text-white underline">Log Out</a>
+      </div>
+    </div>
+  </aside>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden w-full h-full relative">
+    
+    <!-- Flash Messages area -->
+    <div id="flash-container" class="absolute top-0 left-0 right-0 z-50 pointer-events-none p-4 flex flex-col items-center">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="pointer-events-auto w-full max-w-lg mb-2 p-4 rounded-md shadow-lg {% if category == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif category == 'success' %}bg-green-100 text-green-800 border border-green-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %} flex justify-between items-start transition-opacity duration-500 flash-msg">
+              <span>{{ message }}</span>
+              <button onclick="this.parentElement.remove()" class="ml-4 text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="flex-1 overflow-auto p-8">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  
+  <!-- Auto-dismiss flashes -->
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.flash-msg').forEach(el => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 5000);
+  </script>
+  
+  {% block scripts %}{% endblock %}
+</body>
+</html>

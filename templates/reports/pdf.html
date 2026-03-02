@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>{{ client.name }} Report - {{ period_start.strftime("%B %Y") }}</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 20mm;
+
+            @bottom-center {
+                content: "{{ settings.company_name }} | Confidential - For Client Use Only | Page " counter(page);
+                font-family: sans-serif;
+                font-size: 8pt;
+                color: #666;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            font-size: 11pt;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: {
+                    {
+                    settings.primary_color
+                }
+            }
+
+            ;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .kpi-container {
+            width: 100%;
+            display: table;
+            margin-bottom: 20px;
+        }
+
+        .kpi-box {
+            display: table-cell;
+            width: 22%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+
+        .kpi-gap {
+            display: table-cell;
+            width: 4%;
+        }
+
+        .kpi-value {
+            font-size: 24pt;
+            font-weight: bold;
+
+            color: {
+                    {
+                    settings.primary_color
+                }
+            }
+
+            ;
+            margin: 10px 0;
+        }
+
+        .kpi-label {
+            font-size: 10pt;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .cover-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 800px;
+        }
+
+        .chart-img {
+            max-width: 100%;
+            height: auto;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="cover-page">
+        <div style="margin-top: 2in;">
+            <h1>{{ settings.company_name }}</h1>
+            <h2 style="font-size: 32pt; margin-bottom: 10px;">Performance Report</h2>
+            <h3 style="font-size: 20pt; color: #555;">for {{ client.name }}</h3>
+            <p style="margin-top: 50px; font-size: 14pt; color: #888;">
+                Reporting Period: <br>
+                <strong>{{ period_start.strftime("%B 1, %Y") }} – {{ period_end.strftime("%B %d, %Y") }}</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- PAGE 2: EXECUTIVE SUMMARY -->
+    <h2>Executive Summary</h2>
+    <div class="kpi-container">
+        <div class="kpi-box">
+            <div class="kpi-label">Sessions</div>
+            <div class="kpi-value">{{ "{:,}".format(metrics.sessions) }}</div>
+        </div>
+        <div class="kpi-gap"></div>
+        <div class="kpi-box">
+            <div class="kpi-label">Conversions</div>
+            <div class="kpi-value">{{ "{:,}".format(metrics.goal_completions) }}</div>
+        </div>
+        <div class="kpi-gap"></div>
+        <div class="kpi-box">
+            <div class="kpi-label">Users</div>
+            <div class="kpi-value">{{ "{:,}".format(metrics.users) }}</div>
+        </div>
+        <div class="kpi-gap"></div>
+        <div class="kpi-box">
+            <div class="kpi-label">Ad Spend</div>
+            <div class="kpi-value">${{ "{:,.2f}".format(metrics.ad_spend) }}</div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- PAGE 3: WEBSITE TRAFFIC -->
+    <h2>Website Traffic</h2>
+    <p>An overview of user engagement during the period.</p>
+    <table>
+        <tr>
+            <th>Sessions</th>
+            <th>Users</th>
+            <th>Pageviews</th>
+            <th>Bounce Rate</th>
+            <th>Avg. Session Dur.</th>
+        </tr>
+        <tr>
+            <td>{{ "{:,}".format(metrics.sessions) }}</td>
+            <td>{{ "{:,}".format(metrics.users) }}</td>
+            <td>{{ "{:,}".format(metrics.pageviews) }}</td>
+            <td>{{ metrics.bounce_rate }}%</td>
+            <td>{{ metrics.avg_session_dur }}s</td>
+        </tr>
+    </table>
+
+    {% if chart_b64 %}
+    <div style="text-align: center;">
+        <img src="data:image/png;base64,{{ chart_b64 }}" class="chart-img">
+    </div>
+    {% endif %}
+
+    <div class="page-break"></div>
+
+    <!-- PAGE 4: TRAFFIC SOURCES -->
+    <h2>Traffic Sources</h2>
+    <table>
+        <tr>
+            <th>Organic</th>
+            <th>Direct</th>
+            <th>Social</th>
+            <th>Referral</th>
+            <th>Paid</th>
+        </tr>
+        <tr>
+            <td>{{ metrics.source_organic }}%</td>
+            <td>{{ metrics.source_direct }}%</td>
+            <td>{{ metrics.source_social }}%</td>
+            <td>{{ metrics.source_referral }}%</td>
+            <td>{{ metrics.source_paid }}%</td>
+        </tr>
+    </table>
+
+    {% if source_chart_b64 %}
+    <div style="text-align: center;">
+        <img src="data:image/png;base64,{{ source_chart_b64 }}" class="chart-img">
+    </div>
+    {% endif %}
+
+    <div class="page-break"></div>
+
+    <!-- PAGE 5: SEO OVERVIEW -->
+    <h2>SEO Overview</h2>
+    <div class="kpi-container" style="width: 70%; margin: 0 auto;">
+        <div class="kpi-box">
+            <div class="kpi-label">Impressions</div>
+            <div class="kpi-value">{{ "{:,}".format(metrics.impressions) }}</div>
+        </div>
+        <div class="kpi-gap"></div>
+        <div class="kpi-box">
+            <div class="kpi-label">Clicks</div>
+            <div class="kpi-value">{{ "{:,}".format(metrics.clicks) }}</div>
+        </div>
+        <div class="kpi-gap"></div>
+        <div class="kpi-box">
+            <div class="kpi-label">Avg Position</div>
+            <div class="kpi-value">{{ metrics.avg_position }}</div>
+        </div>
+    </div>
+
+    <h3>Top Keywords</h3>
+    <table>
+        <tr>
+            <th>Keyword</th>
+            <th>Clicks</th>
+            <th>Position</th>
+        </tr>
+        {% for kw in metrics.top_keywords %}
+        <tr>
+            <td>{{ kw.keyword }}</td>
+            <td>{{ "{:,}".format(kw.clicks) }}</td>
+            <td>{{ kw.position }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if client.show_ads or client.show_email_mkt %}
+    <div class="page-break"></div>
+
+    {% if client.show_ads %}
+    <!-- PAGE 6: ADS PERFORMANCE -->
+    <h2>Ads Performance</h2>
+    <table>
+        <tr>
+            <th>Spend</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>CTR</th>
+            <th>Conv.</th>
+            <th>ROAS</th>
+        </tr>
+        <tr>
+            <td>${{ "{:,.2f}".format(metrics.ad_spend) }}</td>
+            <td>{{ "{:,}".format(metrics.ad_impressions) }}</td>
+            <td>{{ "{:,}".format(metrics.ad_clicks) }}</td>
+            <td>{{ metrics.ad_ctr }}%</td>
+            <td>{{ metrics.ad_conversions }}</td>
+            <td>{{ metrics.ad_roas }}x</td>
+        </tr>
+    </table>
+    {% endif %}
+
+    {% if client.show_email_mkt %}
+    <!-- PAGE 7: EMAIL MARKETING -->
+    <h2>Email Marketing</h2>
+    <table>
+        <tr>
+            <th>Emails Sent</th>
+            <th>Open Rate</th>
+            <th>Click Rate</th>
+            <th>Unsub Rate</th>
+        </tr>
+        <tr>
+            <td>{{ "{:,}".format(metrics.emails_sent) }}</td>
+            <td>{{ metrics.email_open_rate }}%</td>
+            <td>{{ metrics.email_ctr }}%</td>
+            <td>{{ metrics.email_unsub_rate }}%</td>
+        </tr>
+    </table>
+    {% endif %}
+
+    {% endif %}
+
+</body>
+
+</html>

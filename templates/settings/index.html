@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto pb-12">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Company Settings</h2>
+    </div>
+
+    <div class="bg-white shadow rounded-lg mb-8 border border-gray-100">
+        <div class="p-6 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Brand & General</h3>
+            <p class="text-sm text-gray-500">Configure your company name, logo, and colors used across the app and in
+                PDF reports.</p>
+        </div>
+        <div class="p-6">
+
+            <!-- Upload Logo Form -->
+            <form action="{{ url_for('settings.upload_logo') }}" method="POST" enctype="multipart/form-data"
+                class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
+                <div class="flex items-center space-x-6">
+                    <div class="h-16 w-32 bg-white flex items-center justify-center border border-gray-300 rounded">
+                        {% if settings.logo_filename %}
+                        <img src="{{ url_for('static', filename='uploads/logo/' + settings.logo_filename) }}" alt="Logo"
+                            class="max-h-12">
+                        {% else %}
+                        <span class="text-sm text-gray-500">No Logo</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 flex items-center space-x-4">
+                        <input type="file" name="logo" accept=".png,.jpg,.jpeg,.svg"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            required>
+                        <button type="submit" class="btn-primary py-2 px-4 rounded shadow-sm text-sm">Upload</button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Max 2MB. Recommended format: PNG with transparent background.</p>
+            </form>
+
+            <!-- Main Settings Form -->
+            <form action="{{ url_for('settings.index') }}" method="POST" class="space-y-6">
+
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Company Name <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="company_name" value="{{ settings.company_name }}" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Company Description</label>
+                        <textarea name="description" rows="2"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border"
+                            placeholder="Visible on login page">{{ settings.description }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Primary Color</label>
+                        <div class="mt-1 flex space-x-3">
+                            <input type="color" name="primary_color" value="{{ settings.primary_color }}"
+                                class="h-10 w-10 border border-gray-300 rounded cursor-pointer p-1">
+                            <input type="text" value="{{ settings.primary_color }}"
+                                class="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border bg-gray-50"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Accent Color</label>
+                        <div class="mt-1 flex space-x-3">
+                            <input type="color" name="accent_color" value="{{ settings.accent_color }}"
+                                class="h-10 w-10 border border-gray-300 rounded cursor-pointer p-1">
+                            <input type="text" value="{{ settings.accent_color }}"
+                                class="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border bg-gray-50"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Contact Email</label>
+                        <input type="email" name="contact_email" value="{{ settings.contact_email }}"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border"
+                            placeholder="support@company.com">
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+
+                <h3 class="text-lg font-medium text-gray-900 mb-4">SMTP Email Configuration</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                    To send automated reports, enter your email provider's SMTP settings.
+                    For Gmail, you must use an <strong>App Password</strong>.
+                </p>
+
+                <div
+                    class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">SMTP Host</label>
+                        <input type="text" name="smtp_host" value="{{ settings.smtp_host }}"
+                            placeholder="smtp.gmail.com"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">SMTP Port</label>
+                        <input type="number" name="smtp_port" value="{{ settings.smtp_port }}" placeholder="587"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">SMTP Username</label>
+                        <input type="email" name="smtp_user" value="{{ settings.smtp_user }}"
+                            placeholder="you@domain.com"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">SMTP Password</label>
+                        <div class="relative">
+                            <input type="password" name="smtp_pass" id="smtp_pass"
+                                placeholder="Leave blank to keep unchanged"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border pr-16">
+                            <button type="button" onclick="togglePassword('smtp_pass', this)"
+                                class="absolute right-3 top-3 text-xs text-gray-500 hover:text-gray-700 font-medium">SHOW</button>
+                        </div>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">From Name</label>
+                        <input type="text" name="smtp_from" value="{{ settings.smtp_from }}"
+                            placeholder="Reports from My Company"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                    </div>
+                </div>
+
+                <div class="flex justify-between pt-4">
+                    <button type="submit" formaction="{{ url_for('settings.test_email') }}"
+                        class="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Send Test Email
+                    </button>
+                    <button type="submit"
+                        class="btn-primary inline-flex justify-center py-2 px-4 shadow-sm text-sm font-medium rounded-md text-white">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg mb-8 border border-gray-100">
+        <div class="p-6 border-b border-gray-200 relative">
+            <h3 class="text-lg font-medium text-gray-900">Change Admin Password</h3>
+        </div>
+        <div class="p-6">
+            <form action="{{ url_for('auth.change_password') }}" method="POST" class="space-y-4 max-w-md">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Current Password</label>
+                    <input type="password" name="current_password" required
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">New Password</label>
+                    <input type="password" name="new_password" id="new_password" required minlength="6"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                    <div class="relative">
+                        <input type="password" name="confirm_password" id="confirm_password" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm py-2 px-3 border pr-16">
+                        <button type="button" onclick="togglePasswordGroup(this)"
+                            class="absolute right-3 top-3 text-xs text-gray-500 hover:text-gray-700 font-medium">SHOW</button>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="btn-primary py-2 px-4 shadow-sm text-sm font-medium rounded-md text-white mt-4">
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function togglePassword(id, btn) {
+        var x = document.getElementById(id);
+        if (x.type === "password") {
+            x.type = "text";
+            btn.innerText = "HIDE";
+        } else {
+            x.type = "password";
+            btn.innerText = "SHOW";
+        }
+    }
+
+    function togglePasswordGroup(btn) {
+        var n = document.getElementById("new_password");
+        var c = document.getElementById("confirm_password");
+        if (n.type === "password") {
+            n.type = "text"; c.type = "text";
+            btn.innerText = "HIDE";
+        } else {
+            n.type = "password"; c.type = "password";
+            btn.innerText = "SHOW";
+        }
+    }
+</script>
+{% endblock %}

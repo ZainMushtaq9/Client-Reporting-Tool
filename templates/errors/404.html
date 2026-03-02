@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-full flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 text-center pt-32">
+    <div class="h-24 w-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+            </path>
+        </svg>
+    </div>
+    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">404</h1>
+    <p class="mt-2 text-lg text-gray-500">Page not found.</p>
+    <p class="mt-2 text-md text-gray-500 pb-8">The page you were looking for doesn't exist.</p>
+    <a href="{{ url_for('dashboard.index') }}"
+        class="btn-primary inline-flex justify-center py-2 px-6 shadow-sm text-sm font-medium rounded-md text-white">
+        Go back to Dashboard
+    </a>
+</div>
+{% endblock %}
